@@ -1,0 +1,359 @@
+{
+  "filings": [
+    {
+      "confirmation_number": "2018072085603674",
+      "submissiontype": {
+        "description": "COMMENT",
+        "short": "COMMENT",
+        "id": 7,
+        "abbreviation": "CO"
+      },
+      "attachments": [],
+      "documents": [],
+      "bureaus": [],
+      "id_submission": "1072058343193",
+      "lawfirms": [],
+      "viewingstatus": {
+        "description": "Unrestricted",
+        "id": "10"
+      },
+      "contact_email": "mach10@comcast.net",
+      "express_comment": 1,
+      "addressentity": {
+        "city": "Caldwell",
+        "address_line_1": "79 Roseland Ave",
+        "state": "NJ",
+        "zip_code": "07006"
+      },
+      "internationaladdressentity": {
+        "addresstext": ""
+      },
+      "filers": [
+        {
+          "name": "Michael McCormack"
+        }
+      ],
+      "date_submission": "2018-07-20T17:39:15.764Z",
+      "date_disseminated": "2018-07-20T21:00:02.000Z",
+      "filingstatus": {
+        "description": "DISSEMINATED",
+        "id": 30
+      },
+      "emailConfirmation": "true",
+      "proceedings": [
+        {
+          "sunshine_start_date": null,
+          "comment_reply_end_date": null,
+          "_index": "proceedings.new",
+          "city": "",
+          "date_initial_decision": null,
+          "date_nprm": null,
+          "id_bureau": "",
+          "id_proceeding": null,
+          "flag_rulemaking_or_docket": "D",
+          "channel": "",
+          "description": "COMMISSION OPENS DOCKET FOR PROPOSED TRANSFER OF CONTROL OF SPRINT CORPORATION TO T-MOBILE US, INC.",
+          "file_number": "",
+          "total": 22,
+          "date_closed": "2099-12-31T23:59:59.999Z",
+          "date_designated": null,
+          "date_proceeding_created": "2018-06-15T14:27:06.000Z",
+          "callsign": "",
+          "flag_internet_file": "Y",
+          "bureau": {
+            "code": "WTB",
+            "name": "Wireless Telecommunications Bureau",
+            "edocs_bureau_code": "WTB"
+          },
+          "id_state": null,
+          "sunshine_end_date": null,
+          "filed_by": "Danielle.Barnes",
+          "date_archived": null,
+          "face_card_id": null,
+          "flag_historical_data_exists": "N",
+          "consolidated_proceeding_id": null,
+          "date_public_notice": null,
+          "date_rule_board_decision": null,
+          "flag_archived": "N",
+          "flag_small_business_impact": null,
+          "description_display": "COMMISSION OPENS DOCKET FOR PROPOSED TRANSFER OF CONTROL OF SPRINT CORPORATION TO T-MOBILE US, INC.",
+          "comment_end_date": null,
+          "applicant_name": "",
+          "date_effective": null,
+          "comment_start_date": null,
+          "filingStatus": "OPENALL",
+          "date_commission_decision": null,
+          "flag_exparte_allowed": "Y",
+          "name": "18-197",
+          "date_oral_argument": null,
+          "date_reporting_and_order": null,
+          "date_hot_docket": null,
+          "recent_filings": 9,
+          "days": 30,
+          "location": "",
+          "total_disseminated": 16,
+          "rule_section": "",
+          "comment_reply_start_date": null
+        }
+      ],
+      "presented_to": [],
+      "date_received": "2018-07-20T17:39:15.764Z",
+      "text_data": "We need true robust competition in the cellular markets, and cut our current 4 national providers to 3. Decreasing the amount of independent providers will only limit options, increase price to consumers, delay advanced technology deployment and decrease consumer choice overall.",
+      "authors": [],
+      "highlight": {
+        "text_data": [
+          "We need true robust competition in the cellular"
+        ]
+      },
+      "_index": "filings.2018.7"
+    }
+    ],
+  "aggregations": {
+    "express_comment": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 0,
+      "buckets": [
+        {
+          "key": 1,
+          "doc_count": 37075
+        },
+        {
+          "key": 0,
+          "doc_count": 799
+        }
+      ]
+    },
+    "bureaus_description": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 0,
+      "buckets": []
+    },
+    "submissiontype_description": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 35,
+      "buckets": [
+        {
+          "key": "COMMENT",
+          "doc_count": 37257
+        },
+        {
+          "key": "LETTER",
+          "doc_count": 251
+        },
+        {
+          "key": "NOTICE OF EXPARTE",
+          "doc_count": 140
+        },
+        {
+          "key": "OTHER",
+          "doc_count": 72
+        },
+        {
+          "key": "RESPONSE",
+          "doc_count": 33
+        },
+        {
+          "key": "SUPPLEMENT",
+          "doc_count": 31
+        },
+        {
+          "key": "PETITION",
+          "doc_count": 19
+        },
+        {
+          "key": "REPLY",
+          "doc_count": 18
+        },
+        {
+          "key": "PUBLIC NOTICE",
+          "doc_count": 9
+        },
+        {
+          "key": "REPLY TO COMMENTS",
+          "doc_count": 9
+        }
+      ]
+    },
+    "exparte_or_late_filed": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 0,
+      "buckets": []
+    },
+    "is_staff_upload": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 0,
+      "buckets": [
+        {
+          "key": 1,
+          "doc_count": 135
+        },
+        {
+          "key": 0,
+          "doc_count": 61
+        }
+      ]
+    },
+    "proceedings_name": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 19,
+      "buckets": [
+        {
+          "key": "18-197",
+          "doc_count": 37874
+        },
+        {
+          "key": "17-287",
+          "doc_count": 4
+        },
+        {
+          "key": "99-200",
+          "doc_count": 4
+        },
+        {
+          "key": "09-197",
+          "doc_count": 3
+        },
+        {
+          "key": "10-208",
+          "doc_count": 3
+        },
+        {
+          "key": "10-90",
+          "doc_count": 3
+        },
+        {
+          "key": "11-42",
+          "doc_count": 3
+        },
+        {
+          "key": "95-116",
+          "doc_count": 3
+        },
+        {
+          "key": "17-318",
+          "doc_count": 2
+        },
+        {
+          "key": "18-238",
+          "doc_count": 2
+        }
+      ]
+    },
+    "filingstatus_description": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 0,
+      "buckets": [
+        {
+          "key": "disseminated",
+          "doc_count": 37874
+        }
+      ]
+    },
+    "filers_name": {
+      "doc_count_error_upper_bound": 20,
+      "sum_other_doc_count": 37612,
+      "buckets": [
+        {
+          "key": "T-Mobile US, Inc.",
+          "doc_count": 133
+        },
+        {
+          "key": "Sprint Corporation",
+          "doc_count": 68
+        },
+        {
+          "key": "Wireless Telecommunications Bureau",
+          "doc_count": 63
+        },
+        {
+          "key": "DISH Network Corporation",
+          "doc_count": 32
+        },
+        {
+          "key": "Isadore Rosenthal",
+          "doc_count": 24
+        },
+        {
+          "key": "Zoe Spiropoulou",
+          "doc_count": 23
+        },
+        {
+          "key": "Altice USA, Inc.",
+          "doc_count": 21
+        },
+        {
+          "key": "Communications Workers of America",
+          "doc_count": 21
+        },
+        {
+          "key": "SoftBank Group Corp.",
+          "doc_count": 20
+        },
+        {
+          "key": "Mary Ann",
+          "doc_count": 18
+        }
+      ]
+    },
+    "authors_name": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 290,
+      "buckets": [
+        {
+          "key": "Nancy J. Victory",
+          "doc_count": 92
+        },
+        {
+          "key": "Wireless Telecommunications Bureau",
+          "doc_count": 62
+        },
+        {
+          "key": "Nancy Victory",
+          "doc_count": 61
+        },
+        {
+          "key": "Andrew Golodny",
+          "doc_count": 39
+        },
+        {
+          "key": "Regina M. Keeney",
+          "doc_count": 39
+        },
+        {
+          "key": "Allen P. Grunes",
+          "doc_count": 19
+        },
+        {
+          "key": "Johanna R. Thomas",
+          "doc_count": 19
+        },
+        {
+          "key": "Maureen R. Jeffreys",
+          "doc_count": 15
+        },
+        {
+          "key": "Emily J.H. Daniels",
+          "doc_count": 14
+        },
+        {
+          "key": "Caressa D. Bennet",
+          "doc_count": 13
+        }
+      ]
+    },
+    "viewingstatus_description": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 0,
+      "buckets": [
+        {
+          "key": "unrestricted",
+          "doc_count": 37746
+        },
+        {
+          "key": "confidential",
+          "doc_count": 128
+        }
+      ]
+    }
+  }
+}
