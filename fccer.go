@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/ghodss/yaml"
+	"github.com/watson-developer-cloud/go-sdk/core"
+	nlu "github.com/watson-developer-cloud/go-sdk/naturallanguageunderstandingv1"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -21,11 +23,19 @@ type filings struct {
 }
 
 func main() {
-	fetchFilings()
-	//analyze()
+	var filings filings
+	there, _ := exists("fetched.json")
+
+	if there {
+		filings = loadFromFile("fetched.json")
+	} else {
+		filings = fetchFilings()
+	}
+
+	analyze(filings)
 }
 
-func fetchFilings(){
+func fetchFilings() filings {
 	var allFilings filings
 	limit := 250
 	offset := 37500
@@ -42,7 +52,7 @@ func fetchFilings(){
 			os.Exit(-1)
 		}
 
-		filings := load(data)
+		filings := loadFromBytes(data)
 
 		fmt.Println("Got ", len(filings.Entry), " filings.")
 
@@ -63,21 +73,50 @@ func fetchFilings(){
 	fmt.Println("Total filings grabbed: ", len(allFilings.Entry))
 	dumpFilings(allFilings)
 	fmt.Println("Done!")
+
+	return allFilings
 }
 
-func analyze(){
+func analyze(filings filings){
 	// Instantiate the Watson Natural Language Understanding service
 	service, serviceErr := nlu.
 		NewNaturalLanguageUnderstandingV1(&nlu.NaturalLanguageUnderstandingV1Options{
-			URL:      "YOUR SERVICE URL",
 			Version:  "2017-02-27",
-			Username: "YOUR SERVICE USERNAME",
-			Password: "YOUR SERVICE PASSWORD",
+			URL:       "https://gateway.watsonplatform.net/natural-language-understanding/api",
+			IAMApiKey: "api key here",
 		})
 
 	// Check successful instantiation
 	if serviceErr != nil {
 		panic(serviceErr)
+	}
+
+	entry := filings.Entry[1]
+
+	analyzeOptions := service.NewAnalyzeOptions(&nlu.Features{
+		Sentiment: &nlu.SentimentOptions{},
+		//Entities: &nlu.EntitiesOptions{},
+		//Keywords: &nlu.KeywordsOptions{},
+	}).SetText(entry.Comment)
+
+	// Call the naturalLanguageUnderstanding Analyze method
+	response, responseErr := service.Analyze(analyzeOptions)
+
+	// Check successful call
+	if responseErr != nil {
+		panic(responseErr)
+	}
+
+	// Print the entire detailed response
+	fmt.Println(response)
+
+	// Cast analyze.Result to the specific dataType returned by Analyze
+	// NOTE: most methods have a corresponding Get<methodName>Result() function
+	analyzeResult := service.GetAnalyzeResult(response)
+
+	// Check successful casting
+	if analyzeResult != nil {
+		core.PrettyPrint(analyzeResult, "Analyze")
 	}
 }
 
@@ -104,14 +143,18 @@ func dumpFilings(filings filings) {
 }
 
 
-func load(data []byte) filings {
+func loadFromFile(filename string) filings {
 	// Read in our YAML file.
-	//data, err := ioutil.ReadFile("example.json")
-	//if err != nil {
-	//	fmt.Printf("err: %v\n", err)
-	//	os.Exit(-1)
-	//}
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+		os.Exit(-1)
+	}
 
+	return loadFromBytes(data)
+}
+
+func loadFromBytes( data []byte) filings{
 	// Unmarshal the YAML into a struct.
 	var filings filings
 	err := yaml.Unmarshal(data, &filings)
@@ -123,3 +166,14 @@ func load(data []byte) filings {
 	return filings
 }
 
+// exists returns whether the given file or directory exists or not
+func exists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return true, err
+}
