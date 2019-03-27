@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/ghodss/yaml"
-	"github.com/watson-developer-cloud/go-sdk/core"
+	"github.com/joho/godotenv"
 	nlu "github.com/watson-developer-cloud/go-sdk/naturallanguageunderstandingv1"
 	"io/ioutil"
 	"net/http"
@@ -39,11 +39,12 @@ func fetchFilings() filings {
 	var allFilings filings
 	limit := 250
 	offset := 37500
-	for {
-		url := "https://ecfsapi.fcc.gov/filings?limit="+strconv.Itoa(limit)+"&offset="+strconv.Itoa(offset)+"&proceedings.name=18-197&q=18%5C-197&sort=date_disseminated,DESC"
+	proceeding := "18-197"
 
-		//fmt.Println("Current offset: ", offset)
-		//fmt.Println(url)
+	for {
+		url := "https://ecfsapi.fcc.gov/filings?limit="+strconv.Itoa(limit)+"&offset="+strconv.Itoa(offset)+"&proceedings.name="+proceeding+"&sort=date_disseminated,DESC"
+
+		fmt.Println("Requesting at offset: ", offset)
 		response, err := http.Get(url)
 		data, _ := ioutil.ReadAll(response.Body)
 
@@ -78,12 +79,14 @@ func fetchFilings() filings {
 }
 
 func analyze(filings filings){
+	_ = godotenv.Load("ibm-credentials.env")
+
 	// Instantiate the Watson Natural Language Understanding service
 	service, serviceErr := nlu.
 		NewNaturalLanguageUnderstandingV1(&nlu.NaturalLanguageUnderstandingV1Options{
 			Version:  "2017-02-27",
-			URL:       "https://gateway.watsonplatform.net/natural-language-understanding/api",
-			IAMApiKey: "api key here",
+			URL:       os.Getenv("NATURAL_LANGUAGE_UNDERSTANDING_URL"),
+			IAMApiKey: os.Getenv("NATURAL_LANGUAGE_UNDERSTANDING_APIKEY"),
 		})
 
 	// Check successful instantiation
@@ -91,32 +94,59 @@ func analyze(filings filings){
 		panic(serviceErr)
 	}
 
-	entry := filings.Entry[1]
+	analyzeLimit := 10
+	emptyComments := 0
+	var sentimentTotal float64 = 0
+	i:= 0
+	for ; i <= analyzeLimit && i < len(filings.Entry); i ++ {
+		fmt.Println("Analyzing ",i)
+		entry := filings.Entry[i]
 
-	analyzeOptions := service.NewAnalyzeOptions(&nlu.Features{
-		Sentiment: &nlu.SentimentOptions{},
-		//Entities: &nlu.EntitiesOptions{},
-		//Keywords: &nlu.KeywordsOptions{},
-	}).SetText(entry.Comment)
+		if entry.Comment == "" { //Can't analyze nothing.
+			emptyComments++
+			continue;
+		}
 
-	// Call the naturalLanguageUnderstanding Analyze method
-	response, responseErr := service.Analyze(analyzeOptions)
+		analyzeOptions := service.NewAnalyzeOptions(&nlu.Features{
+			Sentiment: &nlu.SentimentOptions{},
+			//Entities: &nlu.EntitiesOptions{},
+			//Keywords: &nlu.KeywordsOptions{},
+		}).SetText(entry.Comment)
 
-	// Check successful call
-	if responseErr != nil {
-		panic(responseErr)
+		// Call the naturalLanguageUnderstanding Analyze method
+		response, responseErr := service.Analyze(analyzeOptions)
+
+		// Check successful call
+		if responseErr != nil {
+			panic(responseErr)
+		}
+
+		// Print the entire detailed response
+		//fmt.Println(response)
+
+		// Cast analyze.Result to the specific dataType returned by Analyze
+		// NOTE: most methods have a corresponding Get<methodName>Result() function
+		analyzeResult := service.GetAnalyzeResult(response)
+
+		// Check successful casting
+		if analyzeResult != nil {
+			score := *analyzeResult.Sentiment.Document.Score
+			if *analyzeResult.Sentiment.Document.Label == "negative" {
+				score = score * -1
+			}
+			sentimentTotal += score
+		}
 	}
 
-	// Print the entire detailed response
-	fmt.Println(response)
-
-	// Cast analyze.Result to the specific dataType returned by Analyze
-	// NOTE: most methods have a corresponding Get<methodName>Result() function
-	analyzeResult := service.GetAnalyzeResult(response)
-
-	// Check successful casting
-	if analyzeResult != nil {
-		core.PrettyPrint(analyzeResult, "Analyze")
+	averageSentiment := (sentimentTotal/float64(i))
+	fmt.Println("A total of ", i, " filings were processed." )
+	fmt.Println("The average sentiment of these filings is ", averageSentiment)
+	fmt.Println("Positive one means in approval, Negative one means in opposition.")
+	fmt.Print("Generally speaking, the comments are ")
+	if averageSentiment > 0 {
+		fmt.Println("in favor of the merger.")
+	} else {
+		fmt.Println("in opposition of the merger.")
 	}
 }
 
