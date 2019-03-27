@@ -94,8 +94,10 @@ func analyze(filings filings){
 		panic(serviceErr)
 	}
 
-	analyzeLimit := 10
+	analyzeLimit := 30
 	emptyComments := 0
+	inFavor := 0
+	inOpposition := 0
 	var sentimentTotal float64 = 0
 	i:= 0
 	for ; i <= analyzeLimit && i < len(filings.Entry); i ++ {
@@ -131,9 +133,13 @@ func analyze(filings filings){
 		// Check successful casting
 		if analyzeResult != nil {
 			score := *analyzeResult.Sentiment.Document.Score
-			if *analyzeResult.Sentiment.Document.Label == "negative" {
-				score = score * -1
+
+			if score > 0 {
+				inFavor ++
+			} else {
+				inOpposition ++
 			}
+
 			sentimentTotal += score
 		}
 	}
@@ -143,11 +149,14 @@ func analyze(filings filings){
 	fmt.Println("The average sentiment of these filings is ", averageSentiment)
 	fmt.Println("Positive one means in approval, Negative one means in opposition.")
 	fmt.Print("Generally speaking, the comments are ")
+
 	if averageSentiment > 0 {
 		fmt.Println("in favor of the merger.")
 	} else {
 		fmt.Println("in opposition of the merger.")
 	}
+
+	fmt.Println("There were ", inFavor, " people that were in favor of the merger, and ", inOpposition, " people in opposition.")
 }
 
 func dumpFilings(filings filings) {
