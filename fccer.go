@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"sort"
 	"strconv"
 	"time"
 )
@@ -22,6 +23,11 @@ type filings struct {
 	Entry []entry `json:"filings"`
 }
 
+type intersection struct {
+	Count int
+	Comment string
+}
+
 func main() {
 	var filings filings
 	there, _ := exists("fetched.json")
@@ -31,14 +37,55 @@ func main() {
 	} else {
 		filings = fetchFilings()
 	}
+	fmt.Println("Loaded ", len(filings.Entry), " filings.")
 
-	analyze(filings)
+	intersections := filter(filings) // need to return the uniques, to use for the analyze
+	analyze(intersections)
 }
+
+func filter(filings filings) []intersection {
+
+	//First, lets sort the filings
+	sort.Slice(filings.Entry, func(i, j int) bool {
+		return filings.Entry[i].Comment < filings.Entry[j].Comment
+	})
+
+	var intersections []intersection
+	var firstOccurrence *string
+	var foundIntersection *intersection
+	totalDuplicates := 0
+	for i:= 0; i < len(filings.Entry); i ++ {
+		if firstOccurrence == nil {
+			firstOccurrence = &filings.Entry[i].Comment
+			multiples := intersection{Comment: *firstOccurrence, Count: 1}
+			foundIntersection = &multiples
+			intersections = append(intersections, multiples)
+		} else if foundIntersection != nil && *firstOccurrence == filings.Entry[i].Comment {
+			foundIntersection.Count++
+			totalDuplicates++
+		} else {
+			//if foundIntersection.Count > 1 {
+			//	hash := md5.Sum([]byte(foundIntersection.Comment))
+			//	fmt.Println("No more duplicates for ",hex.EncodeToString(hash[:]), " with ", foundIntersection.Count, " copies found.")
+			//}
+
+			i --
+			foundIntersection = nil
+			firstOccurrence = nil
+		}
+	}
+
+	fmt.Println("Filtered down to a total of:", len(intersections), " uniques.")
+	fmt.Println("With a total of: ", totalDuplicates, " duplicates removed.")
+
+	return intersections
+}
+
 
 func fetchFilings() filings {
 	var allFilings filings
 	limit := 250
-	offset := 37500
+	offset := 0
 	proceeding := "18-197"
 
 	for {
@@ -78,7 +125,7 @@ func fetchFilings() filings {
 	return allFilings
 }
 
-func analyze(filings filings){
+func analyze(filings []intersection){
 	_ = godotenv.Load("ibm-credentials.env")
 
 	// Instantiate the Watson Natural Language Understanding service
@@ -94,19 +141,19 @@ func analyze(filings filings){
 		panic(serviceErr)
 	}
 
-	analyzeLimit := 30
+	analyzeLimit := 10000
 	emptyComments := 0
 	inFavor := 0
 	inOpposition := 0
 	var sentimentTotal float64 = 0
 	i:= 0
-	for ; i <= analyzeLimit && i < len(filings.Entry); i ++ {
+	for ; i <= analyzeLimit && i < len(filings); i ++ {
 		fmt.Println("Analyzing ",i)
-		entry := filings.Entry[i]
+		entry := filings[i]
 
 		if entry.Comment == "" { //Can't analyze nothing.
 			emptyComments++
-			continue;
+			continue
 		}
 
 		analyzeOptions := service.NewAnalyzeOptions(&nlu.Features{
@@ -120,7 +167,9 @@ func analyze(filings filings){
 
 		// Check successful call
 		if responseErr != nil {
-			panic(responseErr)
+			fmt.Println("Couldn't process ", entry.Comment)
+			fmt.Println(responseErr)
+			continue
 		}
 
 		// Print the entire detailed response
@@ -159,10 +208,16 @@ func analyze(filings filings){
 	fmt.Println("There were ", inFavor, " people that were in favor of the merger, and ", inOpposition, " people in opposition.")
 }
 
-func dumpFilings(filings filings) {
+func printFilings(filings filings)[]byte{
 	newYaml, _ := yaml.Marshal(filings)
 	newJson, _ := yaml.YAMLToJSON(newYaml)
 	fmt.Println(string(newJson))
+	return newJson
+}
+
+
+func dumpFilings(filings filings) {
+	newJson := printFilings(filings)
 
 	f, err := os.Create("fetched.json")
 	if err != nil {
